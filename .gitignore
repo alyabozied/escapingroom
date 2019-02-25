@@ -1,0 +1,13 @@
+*/Intermediate
+*/Build
+*/DerivedDataCache
+*/Binaries
+*/Saved
+*/Content/StarterContent
+*/.vs
+
+Content/StarterContent/
+.vs/
+Intermediate/
+Binaries/
+Saved/
