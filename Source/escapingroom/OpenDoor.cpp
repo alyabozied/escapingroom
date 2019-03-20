@@ -28,25 +28,21 @@ void UOpenDoor::BeginPlay()
 void UOpenDoor::opendoorfunc()
 {
 	//creat an Actor pointer to point to the door
-	AActor*Owner = GetOwner();
+	
 	// frotator to make fquat
-	FRotator Open = FRotator(0, -90, 0);
-	//is used in function Addactorlocalrotation
-	FQuat OuatOpen = FQuat(Open);
+	FRotator Open = FRotator(0.f, OpeningAngle, 0.f);
 	//rotate the door
-	Owner->AddActorLocalRotation(OuatOpen, false, 0, ETeleportType::None);
+	Owner->SetActorRotation(Open);
 }
 
 void UOpenDoor::closedoor()
 {
 	//creat an Actor pointer to point to the door
-	AActor*Owner = GetOwner();
+	
 	// frotator to make fquat
-	FRotator close = FRotator(0, 90, 0);
-	//is used in function Addactorlocalrotation
-	FQuat Ouatclose = FQuat(close);
+	FRotator close = FRotator(0.f, 0.f, 0.f);
 	//rotate the door
-	Owner->AddActorLocalRotation(Ouatclose, false, 0, ETeleportType::None);
+	Owner->SetActorRotation(close);
 }
 
 
@@ -56,14 +52,15 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
 	//askes every frame if the player is on the pressure plate
-	if (PressurePlat&&PressurePlat->IsOverlappingActor( player)&&!isopen) {
+	if (PressurePlat&&PressurePlat->IsOverlappingActor( player)) {
 
 		opendoorfunc();
-		isopen = true;
+		lastDoorOpenTime = GetWorld()->GetTimeSeconds();
 
 	}
-
+	if (GetWorld()->GetTimeSeconds() - lastDoorOpenTime > delayTime) {
+		closedoor();
+	}
 	
-
 }
 
