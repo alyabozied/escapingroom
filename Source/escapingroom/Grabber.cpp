@@ -20,7 +20,7 @@ UGrabber::UGrabber()
 void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT("Grabber report for reporting duty!"));
+
 	// ...
 	/// lock for attached physcis handle by going ot owner then get the phycishandle component
 	GetPhysicsHandle();
@@ -65,7 +65,8 @@ void UGrabber::Grab()
 	auto actor = HitResult.GetActor();
 	///attach it ot pyhiscs handle or in a simple way to grab it
 	if (actor)
-	{		if (HitResult.GetActor())
+	{	if(physics)
+		if (HitResult.GetActor())
 			physics->GrabComponent(
 				component,
 				NAME_None,
@@ -82,7 +83,8 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	location = Owner->GetActorLocation();
 	rotation = Owner->GetActorRotation();
 	///move object grabbed with the player
-	if (physics->GrabbedComponent)
+	
+	if ((physics)&&physics->GrabbedComponent)
 		physics->SetTargetLocation(GetplayerReach());
 }
 
@@ -105,6 +107,7 @@ FHitResult UGrabber::ObjectInReach()
 }
 
 void UGrabber::Release() {
+	if(physics)
 	physics->ReleaseComponent();
 }
 FVector UGrabber::Getplayerlocation() {

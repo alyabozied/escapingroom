@@ -22,29 +22,12 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 	 player=GetWorld()->GetFirstPlayerController()->GetPawn();
+	 if (PressurePlat == nullptr) {
+		 UE_LOG(LogTemp, Error, TEXT("we are missig pressure plate"))
+	 
+	 }
 	
 }
-
-void UOpenDoor::opendoorfunc()
-{
-	//creat an Actor pointer to point to the door
-	
-	// frotator to make fquat
-	FRotator Open = FRotator(0.f, OpeningAngle, 0.f);
-	//rotate the door
-	Owner->SetActorRotation(Open);
-}
-
-void UOpenDoor::closedoor()
-{
-	//creat an Actor pointer to point to the door
-	
-	// frotator to make fquat
-	FRotator close = FRotator(0.f, 0.f, 0.f);
-	//rotate the door
-	Owner->SetActorRotation(close);
-}
-
 
 // Called every frame
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -52,15 +35,25 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
 	//askes every frame if the player is on the pressure plate
-	if (PressurePlat&&PressurePlat->IsOverlappingActor( player)) {
+	if (GetTotalMassOnPlate()>threshold) {
 
-		opendoorfunc();
-		lastDoorOpenTime = GetWorld()->GetTimeSeconds();
+		FOnOpenRequest.Broadcast();		
 
 	}
-	if (GetWorld()->GetTimeSeconds() - lastDoorOpenTime > delayTime) {
-		closedoor();
+	else {
+		FOnCloseRequest.Broadcast();
 	}
 	
 }
-
+float UOpenDoor::GetTotalMassOnPlate() {
+	float TotalMass = 0;
+	TArray<AActor*> OverlappingObjects;
+	if (PressurePlat) {
+		PressurePlat->GetOverlappingActors(OUT OverlappingObjects);
+		for (auto&actor : OverlappingObjects) {
+			TotalMass = actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+		}
+	}
+	
+	return TotalMass;
+}
